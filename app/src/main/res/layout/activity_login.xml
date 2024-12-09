@@ -1,46 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="16dp"
+    android:gravity="center"
+    android:background="#D2B48C"
     tools:context=".LoginActivity">
+
+    <!-- Imagen en la parte superior -->
+
+    <!-- Campo de correo electrónico -->
+
+    <ImageView
+        android:id="@+id/logoImageView"
+        android:layout_width="161dp"
+        android:layout_height="168dp"
+        android:layout_gravity="center"
+        android:layout_marginBottom="16dp"
+        android:contentDescription="Logo"
+        android:src="@drawable/ic_insta_coffee" />
+
     <EditText
         android:id="@+id/emailEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Correo electrónico" />
+        android:layout_marginBottom="8dp"
+        android:hint="Correo electrónico"
+        android:inputType="textEmailAddress" />
 
-
+    <!-- Campo de contraseña -->
     <EditText
         android:id="@+id/passwordEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Contraseña"
-        android:inputType="textPassword" />
+        android:inputType="textPassword"
+        android:layout_marginBottom="16dp" />
 
-
+    <!-- Botón de registrar -->
     <Button
         android:id="@+id/registerButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
         android:text="Registrar" />
 
-
+    <!-- Botón de iniciar sesión -->
     <Button
         android:id="@+id/loginButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Iniciar sesión" />
-
+        android:text="Iniciar sesión"
+        android:layout_marginBottom="8dp" />
 
     <Button
         android:id="@+id/logoutButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Cerrar sesión" />
-
 
 </LinearLayout>
