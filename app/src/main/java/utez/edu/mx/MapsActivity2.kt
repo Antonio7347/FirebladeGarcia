@@ -33,8 +33,6 @@ class MapsActivity2 : AppCompatActivity(), OnMapReadyCallback {
         GoogleMap.MAP_TYPE_SATELLITE,
         GoogleMap.MAP_TYPE_TERRAIN
     )
-
-
     private fun changeMapType() {
         mapTypeIndex = (mapTypeIndex + 1) % mapTypes.size
         map.mapType = mapTypes[mapTypeIndex]
@@ -45,27 +43,22 @@ class MapsActivity2 : AppCompatActivity(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
         map.uiSettings.isZoomControlsEnabled = true
-        loadGlobalMarkers() // Cargar marcadores globales
+        loadGlobalMarkers()
         loadUserReviews()
-
         val locations = listOf(
             Pair(LatLng(19.432608, -99.133209), "Neko cafe"),
             Pair(LatLng(20.659698, -103.349609), "Cafe italiano"),
             Pair(LatLng(18.729407, -99.163642), "Cafe Mexicano")
         )
-
         for ((latLng, title) in locations) {
             map.addMarker(
                 MarkerOptions().position(latLng).title(title).snippet("Haz clic para agregar una reseña")
             )
         }
-
         map.setOnInfoWindowClickListener { marker ->
             showReviewDialog(marker.title, marker.position)
         }
-
-        loadUserReviews() // Cargar reseñas del usuario
-
+        loadUserReviews()
         val bounds = LatLngBounds.Builder()
         locations.forEach { bounds.include(it.first) }
         map.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds.build(), 150))
@@ -81,7 +74,6 @@ class MapsActivity2 : AppCompatActivity(), OnMapReadyCallback {
             .setView(dialogView)
             .setNegativeButton("Cancelar", null)
             .create()
-
         dialogView.findViewById<Button>(R.id.submitReviewButton).setOnClickListener {
             val review = reviewEditText.text.toString()
             if (review.isNotEmpty()) {
@@ -91,7 +83,6 @@ class MapsActivity2 : AppCompatActivity(), OnMapReadyCallback {
                 Toast.makeText(this, "Por favor escribe una reseña", Toast.LENGTH_SHORT).show()
             }
         }
-
         dialog.show()
     }
 
@@ -99,23 +90,19 @@ class MapsActivity2 : AppCompatActivity(), OnMapReadyCallback {
     private fun saveReviewToFirebase(title: String?, position: LatLng, review: String) {
         val auth = FirebaseAuth.getInstance()
         val currentUser = auth.currentUser
-
         if (currentUser == null) {
             Toast.makeText(this, "Debes iniciar sesión para guardar una reseña", Toast.LENGTH_SHORT).show()
             return
         }
-
         val userUid = currentUser.uid
         val database = FirebaseDatabase.getInstance().reference.child("reviews").child(userUid)
         val reviewId = database.push().key ?: return
-
         val reviewData = mapOf(
             "title" to title,
             "latitude" to position.latitude,
             "longitude" to position.longitude,
             "review" to review
         )
-
         database.child(reviewId).setValue(reviewData).addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 Toast.makeText(this, "Reseña guardada exitosamente", Toast.LENGTH_SHORT).show()
@@ -143,7 +130,6 @@ class MapsActivity2 : AppCompatActivity(), OnMapReadyCallback {
                     }
                 }
             }
-
             override fun onCancelled(error: DatabaseError) {
                 Toast.makeText(this@MapsActivity2, "Error al cargar marcadores: ${error.message}", Toast.LENGTH_SHORT).show()
             }
@@ -155,15 +141,12 @@ class MapsActivity2 : AppCompatActivity(), OnMapReadyCallback {
     private fun loadUserReviews() {
         val auth = FirebaseAuth.getInstance()
         val currentUser = auth.currentUser
-
         if (currentUser == null) {
             Toast.makeText(this, "Debes iniciar sesión para ver tus reseñas", Toast.LENGTH_SHORT).show()
             return
         }
-
         val userUid = currentUser.uid
         val database = FirebaseDatabase.getInstance().reference.child("reviews").child(userUid)
-
         database.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 for (reviewSnapshot in snapshot.children) {
@@ -180,7 +163,6 @@ class MapsActivity2 : AppCompatActivity(), OnMapReadyCallback {
                     }
                 }
             }
-
             override fun onCancelled(error: DatabaseError) {
                 Toast.makeText(this@MapsActivity2, "Error al cargar reseñas: ${error.message}", Toast.LENGTH_SHORT).show()
             }
@@ -191,65 +173,67 @@ class MapsActivity2 : AppCompatActivity(), OnMapReadyCallback {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // Inflar el layout usando ViewBinding
         binding = ActivityMaps2Binding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // Obtener el fragmento del mapa y configurar el callback para cuando esté listo
         val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
-        mapFragment.getMapAsync(this)
+        mapFragment.getMapAsync(this) // 'this' indica que la clase actual implementa OnMapReadyCallback
 
+        // Listener para cambiar el tipo de mapa (normal, satélite, híbrido, etc.)
         findViewById<Button>(R.id.btnChangeMapType).setOnClickListener {
             changeMapType()
         }
 
+        // Listener para mostrar las reseñas guardadas cuando se haga clic en el botón
         findViewById<Button>(R.id.btnViewReviews).setOnClickListener {
-            displayReviewsDialog()
+            displayReviewsDialog() // Método que muestra el diálogo con las reseñas
         }
     }
-//
-//    private fun loadUserReviews() {
-//        val auth = FirebaseAuth.getInstance()
-//        val currentUser = auth.currentUser
-//
-//        if (currentUser == null) {
-//            Toast.makeText(this, "Debes iniciar sesión para ver tus reseñas", Toast.LENGTH_SHORT).show()
-//            return
-//        }
-//
-//        val userEmail = currentUser.email
-//
-//        if (userEmail.isNullOrEmpty()) {
-//            Toast.makeText(this, "Tu cuenta no tiene un correo asociado, no puedes ver reseñas", Toast.LENGTH_SHORT).show()
-//            return
-//        }
-//
-//        val database = FirebaseDatabase.getInstance().reference.child("reviews").child(currentUser.uid)
-//
+
+
+
+
+//    private fun displayReviewsDialog() {
+//        val database = FirebaseDatabase.getInstance().reference.child("reviews")
 //        database.addListenerForSingleValueEvent(object : ValueEventListener {
 //            override fun onDataChange(snapshot: DataSnapshot) {
+//                val reviews = mutableListOf<String>()
 //                for (reviewSnapshot in snapshot.children) {
-//                    val title = reviewSnapshot.child("title").value as? String
-//                    val latitude = reviewSnapshot.child("latitude").value as? Double
-//                    val longitude = reviewSnapshot.child("longitude").value as? Double
-//                    val review = reviewSnapshot.child("review").value as? String
+//                    val title = reviewSnapshot.child("title").getValue(String::class.java)
+//                    val review = reviewSnapshot.child("review").getValue(String::class.java)
+//                    val latitude = reviewSnapshot.child("latitude").getValue(Double::class.java)
+//                    val longitude = reviewSnapshot.child("longitude").getValue(Double::class.java)
 //
-//                    if (title != null && latitude != null && longitude != null && review != null) {
-//                        val position = LatLng(latitude, longitude)
-//                        map.addMarker(
-//                            MarkerOptions().position(position).title(title).snippet(review)
-//                        )
+//                    if (title != null && review != null && latitude != null && longitude != null) {
+//                        val location = "(${latitude}, ${longitude})"
+//                        reviews.add("Lugar: $title\nUbicación: $location\nReseña: $review")
 //                    }
 //                }
+//                if (reviews.isNotEmpty()) {
+//                    showReviewsDialog(reviews)
+//                } else {
+//                    Toast.makeText(this@MapsActivity2, "No hay reseñas disponibles", Toast.LENGTH_SHORT).show()
+//                }
 //            }
-//
 //            override fun onCancelled(error: DatabaseError) {
-//                Toast.makeText(this@MapsActivity2, "Error al cargar reseñas: ${error.message}", Toast.LENGTH_SHORT).show()
+//                Toast.makeText(this@MapsActivity2, "Error al cargar reseñas", Toast.LENGTH_SHORT).show()
 //            }
 //        })
 //    }
 
-
     private fun displayReviewsDialog() {
-        val database = FirebaseDatabase.getInstance().reference.child("reviews")
+        val auth = FirebaseAuth.getInstance()
+        val currentUser = auth.currentUser
+
+        if (currentUser == null) {
+            Toast.makeText(this, "Debes iniciar sesión para ver tus reseñas", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val userUid = currentUser.uid
+        val database = FirebaseDatabase.getInstance().reference.child("reviews").child(userUid)
 
         database.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
@@ -269,27 +253,25 @@ class MapsActivity2 : AppCompatActivity(), OnMapReadyCallback {
                 if (reviews.isNotEmpty()) {
                     showReviewsDialog(reviews)
                 } else {
-                    Toast.makeText(this@MapsActivity2, "No hay reseñas disponibles", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@MapsActivity2, "No tienes reseñas guardadas", Toast.LENGTH_SHORT).show()
                 }
             }
 
             override fun onCancelled(error: DatabaseError) {
-                Toast.makeText(this@MapsActivity2, "Error al cargar reseñas", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@MapsActivity2, "Error al cargar reseñas: ${error.message}", Toast.LENGTH_SHORT).show()
             }
         })
     }
 
     private fun showReviewsDialog(reviews: List<String>) {
         val dialog = android.app.AlertDialog.Builder(this)
-            .setTitle("Reseñas Guardadas")
+            .setTitle("Mis Reseñas")
             .setItems(reviews.toTypedArray(), null)
             .setPositiveButton("Cerrar", null)
             .create()
 
         dialog.show()
     }
-
-
 
 
 }
