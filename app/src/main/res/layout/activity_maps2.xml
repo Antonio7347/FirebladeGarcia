@@ -17,7 +17,7 @@
         android:layout_alignParentBottom="true"
         android:layout_marginStart="20dp"
         android:layout_marginBottom="48dp"
-        android:text="Ver Reseñas" />
+        android:text="Ver reseñas globales" />
 
     <Button
         android:id="@+id/btnChangeMapType"
