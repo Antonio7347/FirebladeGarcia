@@ -28,4 +28,15 @@
         android:layout_marginStart="20dp"
         android:layout_marginBottom="7dp"
         android:text="Cambiar Mapa" />
+
+    <Button
+        android:id="@+id/btnOut"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/btnViewReviews"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="23dp"
+        android:layout_marginBottom="65dp"
+        android:text="Volver al login" />
+
 </RelativeLayout>

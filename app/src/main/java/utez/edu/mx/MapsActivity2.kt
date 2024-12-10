@@ -1,5 +1,6 @@
 package utez.edu.mx
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -184,6 +185,14 @@ class MapsActivity2 : AppCompatActivity(), OnMapReadyCallback {
         // Listener para cambiar el tipo de mapa (normal, satélite, híbrido, etc.)
         findViewById<Button>(R.id.btnChangeMapType).setOnClickListener {
             changeMapType()
+        }
+
+
+
+        findViewById<Button>(R.id.btnOut).setOnClickListener {
+            val intent : Intent = Intent(this, LoginActivity::class.java)
+            startActivity(intent)
+            FirebaseAuth.getInstance().signOut()
         }
 
         // Listener para mostrar las reseñas guardadas cuando se haga clic en el botón
