@@ -57,10 +57,10 @@
         android:text="Iniciar sesión"
         android:layout_marginBottom="8dp" />
 
-    <Button
-        android:id="@+id/logoutButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Cerrar sesión" />
+<!--    <Button-->
+<!--        android:id="@+id/logoutButton"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="Cerrar sesión" />-->
 
 </LinearLayout>

@@ -17,7 +17,7 @@ class LoginActivity : AppCompatActivity() {
         val passwordEditText = findViewById<EditText>(R.id.passwordEditText)
         val registerButton = findViewById<Button>(R.id.registerButton)
         val loginButton = findViewById<Button>(R.id.loginButton)
-        val logoutButton = findViewById<Button>(R.id.logoutButton)
+//        val logoutButton = findViewById<Button>(R.id.logoutButton)
 
         val auth = FirebaseAuth.getInstance()
 
@@ -64,7 +64,7 @@ class LoginActivity : AppCompatActivity() {
                 passwordEditText.requestFocus()
                 return@setOnClickListener
             }
-
+    
             auth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     Toast.makeText(this, "Inicio de sesión exitoso", Toast.LENGTH_SHORT).show()
@@ -78,11 +78,11 @@ class LoginActivity : AppCompatActivity() {
             }
         }
 
-        logoutButton.setOnClickListener {
-            auth.signOut()
-            Toast.makeText(this, "Sesión cerrada", Toast.LENGTH_SHORT).show()
-            startActivity(Intent(this, LoginActivity::class.java))
-            finish()
-        }
+//        logoutButton.setOnClickListener {
+//            auth.signOut()
+//            Toast.makeText(this, "Sesión cerrada", Toast.LENGTH_SHORT).show()
+//            startActivity(Intent(this, LoginActivity::class.java))
+//            finish()
+//        }
     }
 }
