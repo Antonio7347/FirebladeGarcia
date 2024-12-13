@@ -13,6 +13,7 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.firebase.auth.FirebaseAuth
 import utez.edu.mx.databinding.ActivityMaps2Binding
@@ -40,9 +41,9 @@ class MapsActivity2 : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun setupUI() {
-        binding!!.btnChangeMapType.setOnClickListener { v -> changeMapType() }
+        binding!!.btnChangeMapType.setOnClickListener { changeMapType() }
 
-        binding!!.btnOut.setOnClickListener { v ->
+        binding!!.btnOut.setOnClickListener {
             FirebaseAuth.getInstance().signOut()
             startActivity(Intent(this, LoginActivity::class.java))
             finish()
@@ -53,13 +54,15 @@ class MapsActivity2 : AppCompatActivity(), OnMapReadyCallback {
         map = googleMap
         map!!.uiSettings.isZoomControlsEnabled = true
 
-        // Adding predefined markers
+        // Agregar un marcador con título personalizado
+        map!!.setOnMapClickListener { latLng ->
+            showAddMarkerDialog(latLng)
+        }
 
-        // Allow user to set marker title
-        map!!.setOnMapClickListener { latLng: LatLng ->
-            showAddMarkerDialog(
-                latLng
-            )
+        // Manejar clics en los marcadores
+        map!!.setOnMarkerClickListener { marker ->
+            showEditOrDeleteDialog(marker)
+            true // Devuelve true para indicar que el evento ha sido manejado
         }
     }
 
@@ -78,16 +81,49 @@ class MapsActivity2 : AppCompatActivity(), OnMapReadyCallback {
         AlertDialog.Builder(this)
             .setTitle("Agregar marcador")
             .setView(input)
-            .setPositiveButton("Guardar") { dialog: DialogInterface?, which: Int ->
-                val title = input.text.toString().trim { it <= ' ' }
-                if (!title.isEmpty()) {
+            .setPositiveButton("Guardar") { _, _ ->
+                val title = input.text.toString().trim()
+                if (title.isNotEmpty()) {
                     map!!.addMarker(MarkerOptions().position(latLng).title(title))
                 } else {
-                    Toast.makeText(
-                        this,
-                        "El título no puede estar vacío",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Toast.makeText(this, "El título no puede estar vacío", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .setNegativeButton("Cancelar", null)
+            .show()
+    }
+
+    private fun showEditOrDeleteDialog(marker: Marker) {
+        AlertDialog.Builder(this)
+            .setTitle("Editar o eliminar marcador")
+            .setMessage("¿Qué deseas hacer con el marcador seleccionado?")
+            .setPositiveButton("Editar") { _, _ ->
+                showEditMarkerDialog(marker)
+            }
+            .setNegativeButton("Eliminar") { _, _ ->
+                marker.remove()
+                Toast.makeText(this, "Marcador eliminado", Toast.LENGTH_SHORT).show()
+            }
+            .setNeutralButton("Cancelar", null)
+            .show()
+    }
+
+    private fun showEditMarkerDialog(marker: Marker) {
+        val input = EditText(this)
+        input.hint = "Escribe un nuevo título"
+        input.setText(marker.title)
+
+        AlertDialog.Builder(this)
+            .setTitle("Editar marcador")
+            .setView(input)
+            .setPositiveButton("Guardar") { _, _ ->
+                val newTitle = input.text.toString().trim()
+                if (newTitle.isNotEmpty()) {
+                    marker.title = newTitle
+                    marker.showInfoWindow()
+                    Toast.makeText(this, "Marcador actualizado", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(this, "El título no puede estar vacío", Toast.LENGTH_SHORT).show()
                 }
             }
             .setNegativeButton("Cancelar", null)
